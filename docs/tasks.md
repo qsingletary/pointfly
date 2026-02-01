@@ -6,7 +6,7 @@
 - [x] Phase 1: Project Foundation
 - [x] Phase 2: Backend Foundation
 - [x] Phase 3: Data Models
-- [ ] Phase 4: Backend Authentication
+- [x] Phase 4: Backend Authentication
 - [ ] Phase 5: Odds API Integration
 - [ ] Phase 6: Backend API Endpoints
 - [ ] Phase 7: Frontend Foundation
@@ -89,15 +89,28 @@
 
 ---
 
-## Phase 4: Backend Authentication
+## Phase 4: Backend Authentication ✓
 
 ### Tasks
 
-- [ ] Create JWT Strategy (validates tokens from NextAuth)
-- [ ] Create JwtAuthGuard for protected endpoints
-- [ ] Create AdminApiKeyGuard (checks `x-admin-api-key` header)
-- [ ] Create CurrentUser decorator
-- [ ] Create auth endpoint to exchange OAuth tokens for backend JWT
+- [x] Create JWT Strategy (validates backend-issued JWTs)
+- [x] Create JwtAuthGuard for protected endpoints
+- [x] Create AdminApiKeyGuard (checks `x-admin-api-key` header with timing-safe comparison)
+- [x] Create CurrentUser decorator
+- [x] Create secure token exchange endpoint (`POST /auth/token`)
+  - Accepts Google ID token from frontend
+  - Verifies token signature against Google's public keys using `google-auth-library`
+  - Validates `aud` claim matches `GOOGLE_CLIENT_ID`
+  - Extracts user info only after verification
+  - Upserts user in database and issues backend JWT
+- [x] Create `GET /auth/me` endpoint for fetching current user data
+
+### Security Features
+
+- Google ID token verification prevents token forgery
+- Timing-safe comparison on admin API key prevents timing attacks
+- JWT expiration enforced (`ignoreExpiration: false`)
+- All secrets loaded from validated environment variables
 
 **Commit**: `feat(backend): implement jwt authentication and admin api key guard`
 
@@ -151,8 +164,8 @@
 
 - [ ] Configure NextAuth with Google provider
 - [ ] Use JWT session strategy
-- [ ] In JWT callback: exchange OAuth token for backend JWT
-- [ ] Store backend JWT in session
+- [ ] In JWT callback: send `account.id_token` (Google ID token) to `POST /auth/token`
+- [ ] Store returned backend JWT (`accessToken`) in session
 - [ ] Create middleware for protected routes
 - [ ] Create sign-in page
 

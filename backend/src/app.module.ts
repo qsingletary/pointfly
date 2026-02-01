@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configuration, validationSchema } from './config';
+import { AuthModule } from './auth';
 import { UsersModule } from './users';
 import { GamesModule } from './games';
 import { BetsModule } from './bets';
@@ -22,6 +23,7 @@ import { BetsModule } from './bets';
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
     UsersModule,
     GamesModule,
     BetsModule,

@@ -13,4 +13,7 @@ export default () => ({
     baseUrl: 'https://api.the-odds-api.com/v4',
   },
   favoriteTeam: process.env.FAVORITE_TEAM,
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+  },
 });
