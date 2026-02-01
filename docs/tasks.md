@@ -5,7 +5,7 @@
 - [x] Planning complete
 - [x] Phase 1: Project Foundation
 - [x] Phase 2: Backend Foundation
-- [ ] Phase 3: Data Models
+- [x] Phase 3: Data Models
 - [ ] Phase 4: Backend Authentication
 - [ ] Phase 5: Odds API Integration
 - [ ] Phase 6: Backend API Endpoints
@@ -76,14 +76,14 @@
 
 ---
 
-## Phase 3: Data Models
+## Phase 3: Data Models ✓
 
 ### Tasks
 
-- [ ] Create User schema (`email`, `name`, `image?`, `providerId`, `points`)
-- [ ] Create Game schema (`gameId`, `homeTeam`, `awayTeam`, `startTime`, `spread`, `spreadTeam`, `status: 'upcoming'|'finished'`, `finalHomeScore?`, `finalAwayScore?`, timestamps)
-- [ ] Create Bet schema (`userId`, `gameId`, `selection: 'favorite'|'opponent'`, `status: 'pending'|'won'|'lost'|'push'`, `spreadAtBet`, `createdAt`)
-- [ ] Add compound unique index on `userId + gameId` for Bet
+- [x] Create User schema (`email`, `name`, `image?`, `providerId`, `points`)
+- [x] Create Game schema (`gameId`, `homeTeam`, `awayTeam`, `startTime`, `spread`, `spreadTeam`, `status: 'upcoming'|'finished'`, `finalHomeScore?`, `finalAwayScore?`, timestamps)
+- [x] Create Bet schema (`userId`, `gameId`, `selection: 'favorite'|'opponent'`, `status: 'pending'|'won'|'lost'|'push'`, `spreadAtBet`, `createdAt`)
+- [x] Add compound unique index on `userId + gameId` for Bet
 
 **Commit**: `feat(backend): add mongoose schemas for user, game, and bet`
 
