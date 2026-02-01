@@ -153,6 +153,7 @@ Frontend                          Backend
 ```
 
 **Security Features**:
+
 - Google ID token verification via `google-auth-library`
 - Timing-safe admin API key comparison (prevents timing attacks)
 - JWT expiration enforced
