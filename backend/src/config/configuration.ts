@@ -13,7 +13,6 @@ export default () => ({
     baseUrl: 'https://api.the-odds-api.com/v4',
     sport: process.env.ODDS_API_SPORT || 'basketball_nba',
   },
-  favoriteTeam: process.env.FAVORITE_TEAM,
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
   },

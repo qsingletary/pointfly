@@ -65,9 +65,6 @@ ADMIN_API_KEY=your_admin_api_key_min_32_chars
 
 # Google OAuth
 GOOGLE_CLIENT_ID=your_google_client_id
-
-# Team Configuration
-FAVORITE_TEAM=Your Team Name
 ```
 
 Create a `.env.local` file in the `frontend/` directory (when frontend is implemented):
@@ -129,6 +126,12 @@ pointfly/
 
 ## API Endpoints
 
+### Health
+
+| Method | Path | Auth | Description                                      |
+| ------ | ---- | ---- | ------------------------------------------------ |
+| GET    | /    | None | API health status (version, uptime, environment) |
+
 ### Authentication
 
 | Method | Path        | Auth | Description                              |
@@ -136,13 +139,20 @@ pointfly/
 | POST   | /auth/token | None | Exchange Google ID token for backend JWT |
 | GET    | /auth/me    | JWT  | Get current user data                    |
 
+### Users
+
+| Method | Path                 | Auth | Description              |
+| ------ | -------------------- | ---- | ------------------------ |
+| PATCH  | /users/favorite-team | JWT  | Set user's favorite team |
+| GET    | /users/favorite-team | JWT  | Get user's favorite team |
+
 ### Games
 
-| Method | Path                  | Auth          | Description                    |
-| ------ | --------------------- | ------------- | ------------------------------ |
-| GET    | /games/next           | JWT           | Get next game and odds         |
-| POST   | /games/next           | JWT           | Fetch from Odds API and upsert |
-| POST   | /games/:gameId/settle | Admin API Key | Settle game with final scores  |
+| Method | Path                  | Auth          | Description                            |
+| ------ | --------------------- | ------------- | -------------------------------------- |
+| GET    | /games/next           | JWT           | Get next game for user's favorite team |
+| POST   | /games/next           | JWT           | Fetch from Odds API for user's team    |
+| POST   | /games/:gameId/settle | Admin API Key | Settle game with final scores          |
 
 ### Bets
 
@@ -189,7 +199,8 @@ Frontend                          Backend
   name: string;
   image?: string;
   providerId: string;
-  points: number;  // Default: 0
+  points: number;       // Default: 0
+  favoriteTeam?: string; // User's selected team
 }
 ```
 
@@ -218,6 +229,7 @@ Frontend                          Backend
   selection: 'favorite' | 'opponent';
   status: 'pending' | 'won' | 'lost' | 'push';
   spreadAtBet: number; // Spread at time of bet
+  favoriteTeamAtBet: string; // User's team at bet time (for settlement)
 }
 ```
 
@@ -225,14 +237,15 @@ Frontend                          Backend
 
 ## Settlement Logic
 
-When an admin settles a game:
+When an admin settles a game, each bet is settled using the user's favorite team **at the time of bet placement** (`favoriteTeamAtBet`). This ensures bets settle correctly even if users change their favorite team after placing a bet.
 
 ```typescript
-favoriteScore = game.homeTeam === FAVORITE_TEAM ? finalHomeScore : finalAwayScore;
-opponentScore = game.homeTeam === FAVORITE_TEAM ? finalAwayScore : finalHomeScore;
+// For each bet:
+favoriteScore = game.homeTeam === bet.favoriteTeamAtBet ? finalHomeScore : finalAwayScore;
+opponentScore = game.homeTeam === bet.favoriteTeamAtBet ? finalAwayScore : finalHomeScore;
 
 actualMargin = favoriteScore - opponentScore;
-adjustedMargin = actualMargin + spread;
+adjustedMargin = actualMargin + spreadAtBet;
 
 // 'favorite' bet: adjustedMargin > 0 = WIN, < 0 = LOSE, = 0 = PUSH
 // 'opponent' bet: adjustedMargin < 0 = WIN, > 0 = LOSE, = 0 = PUSH
@@ -277,8 +290,8 @@ npm run test:cov         # Run tests with coverage
 - [x] Phase 2: Backend Foundation
 - [x] Phase 3: Data Models
 - [x] Phase 4: Backend Authentication
-- [ ] Phase 5: Odds API Integration
-- [ ] Phase 6: Backend API Endpoints
+- [x] Phase 5: Odds API Integration
+- [x] Phase 6: Backend API Endpoints
 - [ ] Phase 7: Frontend Foundation
 - [ ] Phase 8: Frontend Authentication
 - [ ] Phase 9: Frontend UI

@@ -1,0 +1,669 @@
+openapi: 3.0.3
+info:
+  title: Pointfly API
+  description: Backend API for the Pointfly betting application
+  version: 1.0.0
+  contact:
+    name: Pointfly Team
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: App
+    description: Application health check
+  - name: Auth
+    description: Authentication endpoints
+  - name: Users
+    description: User profile and settings endpoints
+  - name: Games
+    description: Game management endpoints
+  - name: Bets
+    description: Betting endpoints
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/token endpoint
+    AdminApiKey:
+      type: apiKey
+      in: header
+      name: X-Admin-API-Key
+      description: Admin API key for privileged operations
+
+  schemas:
+    TokenExchangeDto:
+      type: object
+      required:
+        - idToken
+      properties:
+        idToken:
+          type: string
+          description: Google OAuth ID token
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT token for subsequent API requests
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: MongoDB user ID
+        email:
+          type: string
+          format: email
+          description: User email address
+        name:
+          type: string
+          description: User display name
+        image:
+          type: string
+          format: uri
+          description: Google profile image URL
+        points:
+          type: integer
+          description: User's earned points
+        favoriteTeam:
+          type: string
+          description: User's favorite team (optional)
+
+    UpdateFavoriteTeamDto:
+      type: object
+      required:
+        - favoriteTeam
+      properties:
+        favoriteTeam:
+          type: string
+          description: The team name to set as favorite
+
+    FavoriteTeamResponse:
+      type: object
+      properties:
+        favoriteTeam:
+          type: string
+          nullable: true
+          description: User's favorite team (null if not set)
+
+    Game:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB game ID
+        gameId:
+          type: string
+          description: External game ID (unique)
+        homeTeam:
+          type: string
+          description: Home team name
+        awayTeam:
+          type: string
+          description: Away team name
+        startTime:
+          type: string
+          format: date-time
+          description: Game start time
+        spread:
+          type: number
+          description: Betting spread (typically negative for favorites)
+        spreadTeam:
+          type: string
+          description: Team the spread favors
+        status:
+          type: string
+          enum: [upcoming, finished]
+          description: Game status
+        finalHomeScore:
+          type: integer
+          description: Final home score (if finished)
+        finalAwayScore:
+          type: integer
+          description: Final away score (if finished)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    GameWithQuota:
+      type: object
+      properties:
+        game:
+          $ref: '#/components/schemas/Game'
+        remainingRequests:
+          type: integer
+          description: Remaining API quota for Odds API
+
+    SettleGameDto:
+      type: object
+      required:
+        - finalHomeScore
+        - finalAwayScore
+      properties:
+        finalHomeScore:
+          type: integer
+          minimum: 0
+          description: Final home team score
+        finalAwayScore:
+          type: integer
+          minimum: 0
+          description: Final away team score
+
+    SettleGameResponse:
+      type: object
+      properties:
+        game:
+          $ref: '#/components/schemas/Game'
+        settledBets:
+          type: integer
+          description: Count of bets that were settled
+        pointsAwarded:
+          type: integer
+          description: Total points awarded to users
+
+    PlaceBetDto:
+      type: object
+      required:
+        - gameId
+        - selection
+      properties:
+        gameId:
+          type: string
+          description: MongoDB ObjectId of game to bet on
+        selection:
+          type: string
+          enum: [favorite, opponent]
+          description: Which team to bet on
+
+    Bet:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB bet ID
+        userId:
+          type: string
+          description: User who placed the bet
+        gameId:
+          oneOf:
+            - type: string
+            - $ref: '#/components/schemas/Game'
+          description: Game being bet on (may be populated)
+        selection:
+          type: string
+          enum: [favorite, opponent]
+          description: Selection made
+        status:
+          type: string
+          enum: [pending, won, lost, push]
+          description: Bet status
+        spreadAtBet:
+          type: number
+          description: Spread value at time of bet
+        favoriteTeamAtBet:
+          type: string
+          description: User's favorite team at time of bet (used for settlement)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        message:
+          type: string
+        error:
+          type: string
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [live, degraded, down]
+          description: Current API health status
+        version:
+          type: string
+          description: API version
+        uptime:
+          type: integer
+          description: Server uptime in seconds
+        timestamp:
+          type: string
+          format: date-time
+          description: Current server timestamp
+        environment:
+          type: string
+          description: Current environment (development, production, etc.)
+
+paths:
+  /:
+    get:
+      tags:
+        - App
+      summary: Health check
+      description: Returns API health status including version, uptime, and environment
+      operationId: getHealth
+      responses:
+        '200':
+          description: API health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+              example:
+                status: 'live'
+                version: '0.0.1'
+                uptime: 3600
+                timestamp: '2024-01-15T12:00:00.000Z'
+                environment: 'development'
+
+  /auth/token:
+    post:
+      tags:
+        - Auth
+      summary: Exchange Google OAuth token
+      description: Exchange a Google OAuth ID token for a backend JWT access token
+      operationId: exchangeToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenExchangeDto'
+            example:
+              idToken: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...'
+      responses:
+        '201':
+          description: Token exchange successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              example:
+                accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                user:
+                  id: '507f1f77bcf86cd799439011'
+                  email: 'user@example.com'
+                  name: 'John Doe'
+                  image: 'https://lh3.googleusercontent.com/...'
+                  points: 0
+        '401':
+          description: Invalid Google ID token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get current user
+      description: Get the authenticated user's profile data
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: '507f1f77bcf86cd799439011'
+                email: 'user@example.com'
+                name: 'John Doe'
+                image: 'https://lh3.googleusercontent.com/...'
+                points: 500
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/favorite-team:
+    patch:
+      tags:
+        - Users
+      summary: Set favorite team
+      description: Set the authenticated user's favorite team
+      operationId: updateFavoriteTeam
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFavoriteTeamDto'
+            example:
+              favoriteTeam: 'Los Angeles Lakers'
+      responses:
+        '200':
+          description: Favorite team updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteTeamResponse'
+              example:
+                favoriteTeam: 'Los Angeles Lakers'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Users
+      summary: Get favorite team
+      description: Get the authenticated user's favorite team
+      operationId: getFavoriteTeam
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Favorite team retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteTeamResponse'
+              example:
+                favoriteTeam: 'Los Angeles Lakers'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /games/next:
+    get:
+      tags:
+        - Games
+      summary: Get next upcoming game
+      description: Get the next upcoming game from the database for the user's favorite team
+      operationId: getNextGame
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Next game retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+              example:
+                _id: '507f1f77bcf86cd799439011'
+                gameId: 'abc123'
+                homeTeam: 'Los Angeles Lakers'
+                awayTeam: 'Boston Celtics'
+                startTime: '2024-01-15T19:30:00Z'
+                spread: -5.5
+                spreadTeam: 'Los Angeles Lakers'
+                status: 'upcoming'
+                createdAt: '2024-01-14T12:00:00Z'
+                updatedAt: '2024-01-14T12:00:00Z'
+        '400':
+          description: User has not set a favorite team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No upcoming games found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Games
+      summary: Fetch and get next game from Odds API
+      description: Fetch games from external Odds API for user's favorite team and return next upcoming game
+      operationId: fetchAndGetNextGame
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Game fetched and returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameWithQuota'
+              example:
+                game:
+                  _id: '507f1f77bcf86cd799439011'
+                  gameId: 'abc123'
+                  homeTeam: 'Los Angeles Lakers'
+                  awayTeam: 'Boston Celtics'
+                  startTime: '2024-01-15T19:30:00Z'
+                  spread: -5.5
+                  spreadTeam: 'Los Angeles Lakers'
+                  status: 'upcoming'
+                  createdAt: '2024-01-14T12:00:00Z'
+                  updatedAt: '2024-01-14T12:00:00Z'
+                remainingRequests: 450
+        '400':
+          description: User has not set a favorite team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No upcoming games found for favorite team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /games/{gameId}/settle:
+    post:
+      tags:
+        - Games
+      summary: Settle a game
+      description: Settle a game with final scores, updates all pending bets, awards points to winners
+      operationId: settleGame
+      security:
+        - AdminApiKey: []
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: MongoDB ObjectId of the game
+          schema:
+            type: string
+          example: '507f1f77bcf86cd799439011'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettleGameDto'
+            example:
+              finalHomeScore: 112
+              finalAwayScore: 105
+      responses:
+        '201':
+          description: Game settled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettleGameResponse'
+              example:
+                game:
+                  _id: '507f1f77bcf86cd799439011'
+                  gameId: 'abc123'
+                  homeTeam: 'Los Angeles Lakers'
+                  awayTeam: 'Boston Celtics'
+                  startTime: '2024-01-15T19:30:00Z'
+                  spread: -5.5
+                  spreadTeam: 'Los Angeles Lakers'
+                  status: 'finished'
+                  finalHomeScore: 112
+                  finalAwayScore: 105
+                  createdAt: '2024-01-14T12:00:00Z'
+                  updatedAt: '2024-01-15T22:00:00Z'
+                settledBets: 25
+                pointsAwarded: 1500
+        '400':
+          description: Game already settled or hasn't started yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Invalid or missing Admin API key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bets:
+    post:
+      tags:
+        - Bets
+      summary: Place a bet
+      description: Place a bet on a game involving user's favorite team (only one bet per user per game allowed)
+      operationId: placeBet
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceBetDto'
+            example:
+              gameId: '507f1f77bcf86cd799439011'
+              selection: 'favorite'
+      responses:
+        '201':
+          description: Bet placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bet'
+              example:
+                _id: '507f1f77bcf86cd799439012'
+                userId: '507f1f77bcf86cd799439013'
+                gameId: '507f1f77bcf86cd799439011'
+                selection: 'favorite'
+                status: 'pending'
+                spreadAtBet: -5.5
+                favoriteTeamAtBet: 'Los Angeles Lakers'
+                createdAt: '2024-01-14T14:00:00Z'
+                updatedAt: '2024-01-14T14:00:00Z'
+        '400':
+          description: Invalid game ID, game already started, game is finished, user has not set favorite team, or game doesn't involve user's favorite team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Game not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: User already has a bet on this game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Bets
+      summary: Get user's bets
+      description: Get all bets for the authenticated user, sorted by creation date (newest first)
+      operationId: getUserBets
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Bets retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bet'
+              example:
+                - _id: '507f1f77bcf86cd799439012'
+                  userId: '507f1f77bcf86cd799439013'
+                  gameId:
+                    _id: '507f1f77bcf86cd799439011'
+                    gameId: 'abc123'
+                    homeTeam: 'Los Angeles Lakers'
+                    awayTeam: 'Boston Celtics'
+                    startTime: '2024-01-15T19:30:00Z'
+                    spread: -5.5
+                    spreadTeam: 'Los Angeles Lakers'
+                    status: 'finished'
+                    finalHomeScore: 112
+                    finalAwayScore: 105
+                  selection: 'favorite'
+                  status: 'won'
+                  spreadAtBet: -5.5
+                  createdAt: '2024-01-14T14:00:00Z'
+                  updatedAt: '2024-01-15T22:00:00Z'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
