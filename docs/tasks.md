@@ -7,7 +7,7 @@
 - [x] Phase 2: Backend Foundation
 - [x] Phase 3: Data Models
 - [x] Phase 4: Backend Authentication
-- [ ] Phase 5: Odds API Integration
+- [x] Phase 5: Odds API Integration
 - [ ] Phase 6: Backend API Endpoints
 - [ ] Phase 7: Frontend Foundation
 - [ ] Phase 8: Frontend Authentication
@@ -116,15 +116,15 @@
 
 ---
 
-## Phase 5: Odds API Integration
+## Phase 5: Odds API Integration ✓
 
 ### Tasks
 
-- [ ] Create OddsApiService
-- [ ] Implement game fetching from The Odds API (filters by `FAVORITE_TEAM` env var)
-- [ ] Parse spread data from bookmakers array
-- [ ] Upsert Game document in MongoDB (create or update)
-- [ ] Return next upcoming game for favorite team
+- [x] Create OddsApiService
+- [x] Implement game fetching from The Odds API (filters by `FAVORITE_TEAM` env var)
+- [x] Parse spread data from bookmakers array
+- [x] Upsert Game document in MongoDB (create or update)
+- [x] Return next upcoming game for favorite team
 
 **Commit**: `feat(backend): integrate the odds api for favorite team game data`
 
