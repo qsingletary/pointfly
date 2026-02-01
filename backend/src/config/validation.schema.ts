@@ -10,6 +10,7 @@ export const validationSchema = Joi.object({
   JWT_EXPIRES_IN: Joi.string().default('7d'),
   ADMIN_API_KEY: Joi.string().required(),
   ODDS_API_KEY: Joi.string().required(),
+  ODDS_API_SPORT: Joi.string().default('basketball_nba'),
   FAVORITE_TEAM: Joi.string().required(),
   GOOGLE_CLIENT_ID: Joi.string().required(),
 });
