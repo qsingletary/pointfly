@@ -11,4 +11,5 @@ export const validationSchema = Joi.object({
   ADMIN_API_KEY: Joi.string().required(),
   ODDS_API_KEY: Joi.string().required(),
   FAVORITE_TEAM: Joi.string().required(),
+  GOOGLE_CLIENT_ID: Joi.string().required(),
 });

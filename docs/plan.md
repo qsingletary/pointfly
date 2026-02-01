@@ -4,8 +4,8 @@
 
 - **Backend**: NestJS + MongoDB/Mongoose
 - **Frontend**: Next.js (App Router) + Tailwind CSS
-- **Auth**: Google OAuth via NextAuth + JWT for backend API
-- **Admin Auth**: Simple API key in headers
+- **Auth**: Google OAuth via NextAuth → Google ID token verified by backend → Backend JWT issued
+- **Admin Auth**: API key in headers (timing-safe comparison)
 - **Testing**: Jest for critical paths
 - **Code Quality**: ESLint, Prettier
 
@@ -122,11 +122,41 @@ pointfly/
 
 **Files**: `backend/src/auth/*`, `backend/src/common/guards/*`
 
-1. Create JWT Strategy (validates tokens from NextAuth)
+1. Create JWT Strategy (validates backend-issued JWTs)
 2. Create JwtAuthGuard for protected endpoints
-3. Create AdminApiKeyGuard (checks `x-admin-api-key` header)
+3. Create AdminApiKeyGuard (checks `x-admin-api-key` header with timing-safe comparison)
 4. Create CurrentUser decorator
-5. Create auth endpoint to exchange OAuth tokens for backend JWT
+5. Create secure token exchange endpoint (`POST /auth/token`)
+
+**Token Exchange Flow**:
+
+```
+Frontend                          Backend
+   |                                 |
+   |  1. User signs in via Google    |
+   |  2. NextAuth receives id_token  |
+   |                                 |
+   |  POST /auth/token               |
+   |  { idToken: "eyJ..." }          |
+   |  -----------------------------> |
+   |                                 |  3. Verify token with Google
+   |                                 |  4. Validate aud == GOOGLE_CLIENT_ID
+   |                                 |  5. Extract user info (sub, email, name)
+   |                                 |  6. Upsert user in MongoDB
+   |                                 |  7. Sign backend JWT
+   |  <----------------------------- |
+   |  { accessToken, user }          |
+   |                                 |
+   |  Subsequent API calls:          |
+   |  Authorization: Bearer <token>  |
+   |  -----------------------------> |
+```
+
+**Security Features**:
+- Google ID token verification via `google-auth-library`
+- Timing-safe admin API key comparison (prevents timing attacks)
+- JWT expiration enforced
+- Secrets validated at startup via Joi schema
 
 **Commit**: `feat(backend): implement jwt authentication and admin api key guard`
 
@@ -198,10 +228,31 @@ adjustedMargin = actualMargin + spread;
 
 1. Configure NextAuth with Google provider
 2. Use JWT session strategy
-3. In JWT callback: exchange OAuth token for backend JWT
-4. Store backend JWT in session
+3. In JWT callback: send `account.id_token` to backend `POST /auth/token`
+4. Store returned `accessToken` in NextAuth session for API calls
 5. Create middleware for protected routes
 6. Create sign-in page
+
+**NextAuth JWT Callback Pattern**:
+
+```typescript
+callbacks: {
+  async jwt({ token, account }) {
+    if (account?.id_token) {
+      // Exchange Google ID token for backend JWT
+      const res = await fetch(`${BACKEND_URL}/auth/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: account.id_token }),
+      });
+      const data = await res.json();
+      token.accessToken = data.accessToken;
+      token.backendUser = data.user;
+    }
+    return token;
+  },
+}
+```
 
 **Commit**: `feat(frontend): implement nextauth with google oauth`
 
@@ -263,7 +314,7 @@ MONGODB_URI=mongodb://localhost:27017/pointfly
 # The Odds API
 ODDS_API_KEY=your_odds_api_key
 
-# JWT (shared between NextAuth and NestJS)
+# Backend JWT
 JWT_SECRET=your_jwt_secret_min_32_chars
 
 # Admin
