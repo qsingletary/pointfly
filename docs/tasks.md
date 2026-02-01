@@ -8,7 +8,7 @@
 - [x] Phase 3: Data Models
 - [x] Phase 4: Backend Authentication
 - [x] Phase 5: Odds API Integration
-- [ ] Phase 6: Backend API Endpoints
+- [x] Phase 6: Backend API Endpoints
 - [ ] Phase 7: Frontend Foundation
 - [ ] Phase 8: Frontend Authentication
 - [ ] Phase 9: Frontend UI
@@ -121,25 +121,25 @@
 ### Tasks
 
 - [x] Create OddsApiService
-- [x] Implement game fetching from The Odds API (filters by `FAVORITE_TEAM` env var)
+- [x] Implement game fetching from The Odds API (filters by user's favorite team)
 - [x] Parse spread data from bookmakers array
 - [x] Upsert Game document in MongoDB (create or update)
-- [x] Return next upcoming game for favorite team
+- [x] Return next upcoming game for user's favorite team
 
 **Commit**: `feat(backend): integrate the odds api for favorite team game data`
 
 ---
 
-## Phase 6: Backend API Endpoints
+## Phase 6: Backend API Endpoints ✓
 
 ### Tasks
 
-- [ ] Implement GET /games/next (returns stored next game and odds)
-- [ ] Implement POST /games/next (fetches from Odds API and upserts in DB)
-- [ ] Implement POST /bets (body: `{ gameId, selection }`, one bet per user per game)
-- [ ] Implement GET /bets (returns bets for authenticated user)
-- [ ] Implement POST /games/:gameId/settle (admin-only, body: `{ finalHomeScore, finalAwayScore }`)
-- [ ] Implement settlement logic (win/lose/push determination, 100 points for wins)
+- [x] Implement GET /games/next (returns stored next game and odds)
+- [x] Implement POST /games/next (fetches from Odds API and upserts in DB)
+- [x] Implement POST /bets (body: `{ gameId, selection }`, one bet per user per game)
+- [x] Implement GET /bets (returns bets for authenticated user)
+- [x] Implement POST /games/:gameId/settle (admin-only, body: `{ finalHomeScore, finalAwayScore }`)
+- [x] Implement settlement logic (win/lose/push determination, 100 points for wins)
 
 **Commit**: `feat(backend): implement games and bets api endpoints`
 

@@ -168,11 +168,13 @@ Frontend                          Backend
 **Files**: `backend/src/games/odds-api.service.ts`
 
 1. Create OddsApiService
-2. Fetch from The Odds API (sport endpoint based on `FAVORITE_TEAM` config)
-3. Filter for games where `home_team` or `away_team` matches `FAVORITE_TEAM` env var
+2. Fetch from The Odds API (sport endpoint based on config)
+3. Filter for games where `home_team` or `away_team` matches user's favorite team
 4. Parse spread from bookmakers array
 5. Upsert Game document in MongoDB (create or update)
-6. Return next upcoming game
+6. Return next upcoming game for user's favorite team
+
+**Note**: Favorite team is now per-user (set via `PATCH /users/favorite-team`) rather than a server-wide env var.
 
 **Commit**: `feat(backend): integrate the odds api for favorite team game data`
 
@@ -194,12 +196,12 @@ Frontend                          Backend
 **Settlement Logic**:
 
 ```typescript
-// Determine which score belongs to favorite team based on home/away
-favoriteScore = game.homeTeam === FAVORITE_TEAM ? finalHomeScore : finalAwayScore;
-opponentScore = game.homeTeam === FAVORITE_TEAM ? finalAwayScore : finalHomeScore;
+// For each bet, use the user's favorite team at bet time (favoriteTeamAtBet)
+favoriteScore = game.homeTeam === bet.favoriteTeamAtBet ? finalHomeScore : finalAwayScore;
+opponentScore = game.homeTeam === bet.favoriteTeamAtBet ? finalAwayScore : finalHomeScore;
 
 actualMargin = favoriteScore - opponentScore;
-adjustedMargin = actualMargin + spread;
+adjustedMargin = actualMargin + spreadAtBet;
 
 // 'favorite' bet: adjustedMargin > 0 = WIN, < 0 = LOSE, = 0 = PUSH
 // 'opponent' bet: adjustedMargin < 0 = WIN, > 0 = LOSE, = 0 = PUSH
@@ -332,8 +334,7 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 # API URL (frontend)
 NEXT_PUBLIC_API_URL=http://localhost:3001
 
-# Team Configuration
-FAVORITE_TEAM=Your Team Name
+# Team Configuration (now per-user, set via API)
 NEXT_PUBLIC_TEAM_NAME=TeamName
 NEXT_PUBLIC_TEAM_PRIMARY=#000000
 NEXT_PUBLIC_TEAM_SECONDARY=#FFFFFF

@@ -41,7 +41,6 @@ export interface NextGameResponse {
 export class OddsApiService {
   private readonly logger = new Logger(OddsApiService.name);
   private readonly client: AxiosInstance;
-  private readonly favoriteTeam: string;
   private readonly sport: string;
 
   constructor(
@@ -56,7 +55,6 @@ export class OddsApiService {
       params: { apiKey },
     });
 
-    this.favoriteTeam = this.configService.getOrThrow<string>('favoriteTeam');
     this.sport = this.configService.get<string>(
       'oddsApi.sport',
       'basketball_nba',
@@ -67,9 +65,9 @@ export class OddsApiService {
    * Fetch games from The Odds API and upsert favorite team games.
    * Returns the next upcoming game for the favorite team.
    */
-  async fetchAndUpsertGames(): Promise<NextGameResponse> {
+  async fetchAndUpsertGames(favoriteTeam: string): Promise<NextGameResponse> {
     this.logger.log(
-      `Fetching odds for ${this.sport}, favorite team: ${this.favoriteTeam}`,
+      `Fetching odds for ${this.sport}, favorite team: ${favoriteTeam}`,
     );
 
     const response = await this.client.get<OddsApiGame[]>(
@@ -93,21 +91,20 @@ export class OddsApiService {
     // Filter for games involving the favorite team
     const favoriteTeamGames = games.filter(
       (game) =>
-        game.home_team === this.favoriteTeam ||
-        game.away_team === this.favoriteTeam,
+        game.home_team === favoriteTeam || game.away_team === favoriteTeam,
     );
 
     this.logger.log(
-      `Found ${favoriteTeamGames.length} games involving ${this.favoriteTeam}`,
+      `Found ${favoriteTeamGames.length} games involving ${favoriteTeam}`,
     );
 
     // Upsert each game
     for (const game of favoriteTeamGames) {
-      await this.upsertGame(game);
+      await this.upsertGame(game, favoriteTeam);
     }
 
     // Return the next upcoming game
-    const nextGame = await this.getNextUpcomingGame();
+    const nextGame = await this.getNextUpcomingGame(favoriteTeam);
 
     return {
       game: nextGame,
@@ -116,13 +113,16 @@ export class OddsApiService {
   }
 
   /**
-   * Get the next upcoming game from the database (without fetching from API).
+   * Get the next upcoming game from the database for the user's favorite team.
    */
-  async getNextUpcomingGame(): Promise<GameDocument | null> {
+  async getNextUpcomingGame(
+    favoriteTeam: string,
+  ): Promise<GameDocument | null> {
     return this.gameModel
       .findOne({
         status: 'upcoming',
         startTime: { $gt: new Date() },
+        $or: [{ homeTeam: favoriteTeam }, { awayTeam: favoriteTeam }],
       })
       .sort({ startTime: 1 })
       .exec();
@@ -131,8 +131,11 @@ export class OddsApiService {
   /**
    * Upsert a game from The Odds API into MongoDB.
    */
-  private async upsertGame(apiGame: OddsApiGame): Promise<GameDocument> {
-    const spread = this.parseSpread(apiGame);
+  private async upsertGame(
+    apiGame: OddsApiGame,
+    favoriteTeam: string,
+  ): Promise<GameDocument> {
+    const spread = this.parseSpread(apiGame, favoriteTeam);
 
     const gameData = {
       gameId: apiGame.id,
@@ -164,7 +167,10 @@ export class OddsApiService {
    * Parse the spread for the favorite team from bookmakers data.
    * Uses the first available bookmaker's spreads market.
    */
-  private parseSpread(apiGame: OddsApiGame): { team: string; point: number } {
+  private parseSpread(
+    apiGame: OddsApiGame,
+    favoriteTeam: string,
+  ): { team: string; point: number } {
     // Find the first bookmaker with spreads market
     for (const bookmaker of apiGame.bookmakers) {
       const spreadsMarket = bookmaker.markets.find((m) => m.key === 'spreads');
@@ -172,23 +178,23 @@ export class OddsApiService {
 
       // Find the outcome for the favorite team
       const favoriteOutcome = spreadsMarket.outcomes.find(
-        (o) => o.name === this.favoriteTeam,
+        (o) => o.name === favoriteTeam,
       );
 
       if (favoriteOutcome) {
         return {
-          team: this.favoriteTeam,
+          team: favoriteTeam,
           point: favoriteOutcome.point,
         };
       }
     }
 
-    // Fallback: if no spread found, use home team with 0 spread
+    // Fallback: if no spread found, use favorite team with 0 spread
     this.logger.warn(
-      `No spread found for ${this.favoriteTeam} in game ${apiGame.id}, using 0`,
+      `No spread found for ${favoriteTeam} in game ${apiGame.id}, using 0`,
     );
     return {
-      team: this.favoriteTeam,
+      team: favoriteTeam,
       point: 0,
     };
   }

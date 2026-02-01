@@ -28,6 +28,9 @@ export class Bet {
 
   @Prop({ required: true })
   spreadAtBet: number;
+
+  @Prop({ required: true })
+  favoriteTeamAtBet: string;
 }
 
 export const BetSchema = SchemaFactory.createForClass(Bet);
