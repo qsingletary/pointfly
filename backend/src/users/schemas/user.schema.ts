@@ -21,6 +21,9 @@ export class User {
   points: number;
 
   @Prop()
+  favoriteSport?: string;
+
+  @Prop()
   favoriteTeam?: string;
 }
 

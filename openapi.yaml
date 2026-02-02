@@ -74,6 +74,9 @@ components:
         points:
           type: integer
           description: User's earned points
+        favoriteSport:
+          type: string
+          description: User's favorite sport key (e.g., 'basketball_nba')
         favoriteTeam:
           type: string
           description: User's favorite team (optional)
@@ -81,19 +84,58 @@ components:
     UpdateFavoriteTeamDto:
       type: object
       required:
+        - sport
         - favoriteTeam
       properties:
+        sport:
+          type: string
+          description: The sport key (e.g., 'basketball_nba')
         favoriteTeam:
           type: string
-          description: The team name to set as favorite
+          description: The team name to set as favorite (must be valid for the sport)
 
     FavoriteTeamResponse:
       type: object
       properties:
+        favoriteSport:
+          type: string
+          nullable: true
+          description: User's favorite sport key (null if not set)
         favoriteTeam:
           type: string
           nullable: true
           description: User's favorite team (null if not set)
+
+    Sport:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Sport key for API calls (e.g., 'basketball_nba')
+        name:
+          type: string
+          description: Display name (e.g., 'NBA')
+
+    SportsListResponse:
+      type: object
+      properties:
+        sports:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sport'
+          description: List of supported sports
+
+    TeamsListResponse:
+      type: object
+      properties:
+        sport:
+          type: string
+          description: The sport key
+        teams:
+          type: array
+          items:
+            type: string
+          description: List of valid team names for the sport
 
     Game:
       type: object
@@ -341,12 +383,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /users/sports:
+    get:
+      tags:
+        - Users
+      summary: Get supported sports
+      description: Get the list of supported sports. Public endpoint - no authentication required.
+      operationId: getSports
+      responses:
+        '200':
+          description: List of supported sports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SportsListResponse'
+              example:
+                sports:
+                  - key: 'basketball_nba'
+                    name: 'NBA'
+
+  /users/sports/{sport}/teams:
+    get:
+      tags:
+        - Users
+      summary: Get teams for a sport
+      description: Get the list of valid teams for a specific sport. Public endpoint - no authentication required.
+      operationId: getTeamsForSport
+      parameters:
+        - name: sport
+          in: path
+          required: true
+          description: Sport key (e.g., 'basketball_nba')
+          schema:
+            type: string
+          example: 'basketball_nba'
+      responses:
+        '200':
+          description: List of teams for the sport
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsListResponse'
+              example:
+                sport: 'basketball_nba'
+                teams:
+                  - 'Boston Celtics'
+                  - 'Los Angeles Lakers'
+                  - 'Golden State Warriors'
+        '404':
+          description: Sport not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /users/favorite-team:
     patch:
       tags:
         - Users
       summary: Set favorite team
-      description: Set the authenticated user's favorite team
+      description: Set the authenticated user's favorite sport and team
       operationId: updateFavoriteTeam
       security:
         - BearerAuth: []
@@ -357,6 +453,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateFavoriteTeamDto'
             example:
+              sport: 'basketball_nba'
               favoriteTeam: 'Los Angeles Lakers'
       responses:
         '200':
@@ -366,7 +463,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/FavoriteTeamResponse'
               example:
+                favoriteSport: 'basketball_nba'
                 favoriteTeam: 'Los Angeles Lakers'
+        '400':
+          description: Invalid sport or team
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '401':
           description: Unauthorized - Invalid or missing JWT token
           content:
@@ -384,7 +488,7 @@ paths:
       tags:
         - Users
       summary: Get favorite team
-      description: Get the authenticated user's favorite team
+      description: Get the authenticated user's favorite sport and team
       operationId: getFavoriteTeam
       security:
         - BearerAuth: []
@@ -396,6 +500,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FavoriteTeamResponse'
               example:
+                favoriteSport: 'basketball_nba'
                 favoriteTeam: 'Los Angeles Lakers'
         '401':
           description: Unauthorized - Invalid or missing JWT token

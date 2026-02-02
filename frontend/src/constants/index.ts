@@ -1,1 +1,2 @@
-export * from './nba-teams';
+export * from './team-colors';
+export * from './sports';

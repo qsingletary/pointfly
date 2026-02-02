@@ -10,7 +10,7 @@
 - [x] Phase 5: Odds API Integration
 - [x] Phase 6: Backend API Endpoints
 - [x] Phase 7: Frontend Foundation
-- [ ] Phase 8: Frontend Authentication
+- [x] Phase 8: Frontend Authentication
 - [ ] Phase 9: Frontend UI
 - [ ] Phase 10: Testing
 - [ ] Phase 11: Documentation
@@ -159,16 +159,16 @@
 
 ---
 
-## Phase 8: Frontend Authentication
+## Phase 8: Frontend Authentication ✓
 
 ### Tasks
 
-- [ ] Configure NextAuth with Google provider
-- [ ] Use JWT session strategy
-- [ ] In JWT callback: send `account.id_token` (Google ID token) to `POST /auth/token`
-- [ ] Store returned backend JWT (`accessToken`) in session
-- [ ] Create middleware for protected routes
-- [ ] Create sign-in page
+- [x] Configure NextAuth with Google provider
+- [x] Use JWT session strategy
+- [x] In JWT callback: send `account.id_token` (Google ID token) to `POST /auth/token`
+- [x] Store returned backend JWT (`accessToken`) in session
+- [x] Create middleware for protected routes
+- [x] Create sign-in page
 
 **Commit**: `feat(frontend): implement nextauth with google oauth`
 

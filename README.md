@@ -141,10 +141,12 @@ pointfly/
 
 ### Users
 
-| Method | Path                 | Auth | Description              |
-| ------ | -------------------- | ---- | ------------------------ |
-| PATCH  | /users/favorite-team | JWT  | Set user's favorite team |
-| GET    | /users/favorite-team | JWT  | Get user's favorite team |
+| Method | Path                       | Auth | Description                        |
+| ------ | -------------------------- | ---- | ---------------------------------- |
+| GET    | /users/sports              | None | Get list of supported sports       |
+| GET    | /users/sports/:sport/teams | None | Get teams for a specific sport     |
+| PATCH  | /users/favorite-team       | JWT  | Set user's favorite sport and team |
+| GET    | /users/favorite-team       | JWT  | Get user's favorite sport and team |
 
 ### Games
 
@@ -199,8 +201,9 @@ Frontend                          Backend
   name: string;
   image?: string;
   providerId: string;
-  points: number;       // Default: 0
-  favoriteTeam?: string; // User's selected team
+  points: number;        // Default: 0
+  favoriteSport?: string; // User's selected sport (e.g., 'basketball_nba')
+  favoriteTeam?: string;  // User's selected team
 }
 ```
 
@@ -293,7 +296,7 @@ npm run test:cov         # Run tests with coverage
 - [x] Phase 5: Odds API Integration
 - [x] Phase 6: Backend API Endpoints
 - [x] Phase 7: Frontend Foundation
-- [ ] Phase 8: Frontend Authentication
+- [x] Phase 8: Frontend Authentication
 - [ ] Phase 9: Frontend UI
 - [ ] Phase 10: Testing
 - [ ] Phase 11: Documentation
