@@ -217,38 +217,18 @@ export function Nav() {
         </div>
       </aside>
 
-      <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 safe-bottom"
-        aria-label="Mobile navigation"
-        style={{
-          background: 'rgba(5, 5, 5, 0.85)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid var(--border)',
-        }}
-      >
-        <div className="flex items-center justify-around h-16 px-2">
+      <nav className="lg:hidden bottom-nav" aria-label="Mobile navigation">
+        <div className="bottom-nav-content">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center justify-center gap-1 px-4 py-2 min-w-[72px] transition-colors"
-                style={{ color: isActive ? 'var(--brand)' : 'var(--text-muted)' }}
+                className={`nav-item-mobile ${isActive ? 'active' : ''}`}
               >
-                <span className="relative">
-                  {isActive ? item.iconFilled : item.icon}
-                  {isActive && (
-                    <span
-                      className="absolute -inset-2 rounded-full -z-10"
-                      style={{
-                        background: 'rgba(191, 255, 0, 0.1)',
-                      }}
-                    />
-                  )}
-                </span>
-                <span className="text-[10px] font-semibold">{item.label}</span>
+                <span className="nav-icon">{isActive ? item.iconFilled : item.icon}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}

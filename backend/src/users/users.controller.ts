@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import {
   JwtAuthGuard,
+  AdminApiKeyGuard,
   CurrentUser,
   SPORTS_CONFIG,
   getTeamsForSport,
@@ -22,6 +23,16 @@ import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  /**
+   * Get all users (admin only).
+   * Returns all users sorted by points.
+   */
+  @Get('all')
+  @UseGuards(AdminApiKeyGuard)
+  async getAllUsers() {
+    return this.usersService.getAllUsers();
+  }
 
   /**
    * Get the list of supported sports.

@@ -21,8 +21,15 @@
     "prettier": "^3.2.5"
   },
   "lint-staged": {
-    "backend/**/*.ts": "npm run lint:backend",
-    "frontend/**/*.{ts,tsx}": "npm run lint:frontend"
+    "backend/**/*.ts": [
+      "prettier --check",
+      "npm run lint:backend"
+    ],
+    "frontend/**/*.{ts,tsx}": [
+      "prettier --check",
+      "npm run lint:frontend"
+    ],
+    "*.{json,md}": "prettier --check"
   },
   "engines": {
     "node": ">=18"

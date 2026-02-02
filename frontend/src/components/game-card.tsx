@@ -8,16 +8,9 @@ interface GameCardProps {
   favoriteTeam: string;
   existingBet: Bet | null;
   onPlaceBet: (selection: 'favorite' | 'opponent') => Promise<void>;
-  onCopyGameId: () => void;
 }
 
-export function GameCard({
-  game,
-  favoriteTeam,
-  existingBet,
-  onPlaceBet,
-  onCopyGameId,
-}: GameCardProps) {
+export function GameCard({ game, favoriteTeam, existingBet, onPlaceBet }: GameCardProps) {
   const [confirmBet, setConfirmBet] = useState<'favorite' | 'opponent' | null>(null);
   const [betting, setBetting] = useState(false);
 
@@ -37,7 +30,7 @@ export function GameCard({
 
   return (
     <div
-      className="p-5 rounded-xl"
+      className="p-5 rounded-xl list-item-enter"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <div className="flex items-center justify-center mb-5">
@@ -207,15 +200,6 @@ export function GameCard({
           </span>
         </div>
       )}
-
-      <button
-        onClick={onCopyGameId}
-        className="w-full mt-4 pt-4 text-center transition-colors hover:text-white cursor-pointer"
-        style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}
-        aria-label={`Copy game ID ${game._id}`}
-      >
-        <span className="text-xs font-mono">ID: {game._id}</span>
-      </button>
     </div>
   );
 }

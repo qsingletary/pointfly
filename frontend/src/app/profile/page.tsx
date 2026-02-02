@@ -284,8 +284,7 @@ export default function ProfilePage() {
 
         {isOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-            style={{ background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(4px)' }}
+            className="modal-backdrop"
             onClick={(e) => {
               if (e.target === e.currentTarget) closeModal();
             }}
@@ -293,10 +292,7 @@ export default function ProfilePage() {
             aria-modal="true"
             aria-labelledby="select-team-title"
           >
-            <div
-              className="w-full sm:max-w-md sm:rounded-2xl overflow-hidden"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-            >
+            <div className="modal-content">
               <div
                 className="flex items-center justify-between px-5 py-4"
                 style={{ borderBottom: '1px solid var(--border)' }}
@@ -434,8 +430,7 @@ export default function ProfilePage() {
 
         {isDeleteOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-            style={{ background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(4px)' }}
+            className="modal-backdrop"
             onClick={(e) => {
               if (e.target === e.currentTarget && !deleting) {
                 setIsDeleteOpen(false);
@@ -447,10 +442,7 @@ export default function ProfilePage() {
             aria-labelledby="delete-account-title"
             aria-describedby="delete-account-description"
           >
-            <div
-              className="w-full sm:max-w-md sm:rounded-2xl overflow-hidden"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-            >
+            <div className="modal-content">
               <div
                 className="flex items-center justify-between px-5 py-4"
                 style={{ borderBottom: '1px solid var(--border)' }}
