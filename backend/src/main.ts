@@ -11,8 +11,25 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  // Security: CORS configuration (must be before helmet)
+  const allowedOrigins = configService
+    .get<string>('allowedOrigins')
+    ?.split(',') || ['http://localhost:3000'];
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-API-Key'],
+  });
+
   // Security: Add helmet for security headers
-  app.use(helmet());
+  // Configure helmet to not conflict with CORS
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+    }),
+  );
 
   // Security: Request size limits
   app.use(express.json({ limit: '10mb' }));
@@ -28,17 +45,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
-
-  // Security: Restrictive CORS configuration
-  const allowedOrigins = configService
-    .get<string>('allowedOrigins')
-    ?.split(',') || ['http://localhost:3000'];
-  app.enableCors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-API-Key'],
-  });
 
   const port = configService.get<number>('port') || 3001;
 
