@@ -50,6 +50,7 @@ export class GamesController {
   /**
    * Fetch games from the Odds API and return the next upcoming game.
    * Updates the database with any new or changed games.
+   * Returns game: null if no upcoming games are found.
    */
   @Post('next')
   @UseGuards(JwtAuthGuard)
@@ -63,10 +64,6 @@ export class GamesController {
     }
 
     const result = await this.oddsApiService.fetchAndUpsertGames(sport, team);
-
-    if (!result.game) {
-      throw new NotFoundException('No upcoming games found for favorite team');
-    }
 
     return {
       game: result.game,

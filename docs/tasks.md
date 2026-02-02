@@ -11,7 +11,7 @@
 - [x] Phase 6: Backend API Endpoints
 - [x] Phase 7: Frontend Foundation
 - [x] Phase 8: Frontend Authentication
-- [ ] Phase 9: Frontend UI
+- [x] Phase 9: Frontend UI
 - [ ] Phase 10: Testing
 - [ ] Phase 11: Documentation
 
@@ -174,18 +174,18 @@
 
 ---
 
-## Phase 9: Frontend UI
+## Phase 9: Frontend UI ✓
 
 ### Tasks
 
-- [ ] Create NextGameCard component (teams, start time, spread, countdown)
-- [ ] Create BetPlacementForm component (selection radio, spread explanation, submit)
-- [ ] Create BetList component (user bets with status badges)
-- [ ] Create UserPointsDisplay component (show current points)
-- [ ] Create dashboard/main page
-- [ ] Implement useNextGame hook (fetch next game on page load)
-- [ ] Implement useBets hook (fetch user bets if logged in)
-- [ ] Implement usePlaceBet mutation hook (refresh bets list on success)
+- [x] Create NextGameCard component (teams, start time, spread, countdown)
+- [x] Create BetPlacementForm component (selection radio, spread explanation, submit)
+- [x] Create BetList component (user bets with status badges)
+- [x] Create UserPointsDisplay component (show current points)
+- [x] Create dashboard/main page
+- [x] Implement useNextGame hook (fetch next game on page load)
+- [x] Implement useBets hook (fetch user bets if logged in)
+- [x] Implement usePlaceBet mutation hook (refresh bets list on success)
 
 **Commit**: `feat(frontend): implement game display and betting ui`
 

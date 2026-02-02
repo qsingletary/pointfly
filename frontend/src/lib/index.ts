@@ -1,3 +1,2 @@
-export { apiClient, setAuthToken } from './api-client';
-export { fetchCurrentUser } from './api/user';
-export type { UserData } from './types/user';
+export * from './api';
+export { default as api } from './api';
