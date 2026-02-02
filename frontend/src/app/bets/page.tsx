@@ -41,7 +41,7 @@ export default function BetsPage() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
         <Nav />
-        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
           <div className="max-w-xl mx-auto space-y-4">
             <div className="h-8 w-28 rounded-lg loading-shimmer" />
             <div className="grid grid-cols-4 gap-3">
@@ -71,7 +71,7 @@ export default function BetsPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Nav />
-      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
         <div className="max-w-xl mx-auto">
           <h1 className="text-2xl font-semibold mb-8">My Bets</h1>
 

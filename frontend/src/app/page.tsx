@@ -141,7 +141,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
         <Nav />
-        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
           <div className="max-w-xl mx-auto space-y-4">
             <div className="h-8 w-32 rounded-lg loading-shimmer" />
             <div className="h-48 rounded-xl loading-shimmer" />
@@ -155,7 +155,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
         <Nav />
-        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
           <div className="max-w-md mx-auto text-center py-20">
             <div
               className="w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center"
@@ -195,7 +195,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Nav />
-      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
         <div className="max-w-xl mx-auto">
           <div className="mb-8">
             <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
@@ -407,7 +407,7 @@ export default function HomePage() {
 
 function LandingView() {
   return (
-    <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+    <main className="min-h-screen flex flex-col safe-top" style={{ background: 'var(--bg)' }}>
       <nav className="px-6 lg:px-12 py-5 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <div

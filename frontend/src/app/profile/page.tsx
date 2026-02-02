@@ -130,7 +130,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
         <Nav />
-        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+        <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
           <div className="max-w-md mx-auto space-y-4">
             <div className="h-8 w-24 rounded-lg loading-shimmer" />
             <div className="h-40 rounded-xl loading-shimmer" />
@@ -143,7 +143,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <Nav />
-      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6">
+      <main className="lg:ml-[240px] pb-20 lg:pb-0 p-6 safe-top lg:pt-6">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-semibold mb-8">Profile</h1>
 

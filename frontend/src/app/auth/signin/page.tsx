@@ -30,7 +30,7 @@ function SignInContent() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+    <main className="min-h-screen flex flex-col safe-top" style={{ background: 'var(--bg)' }}>
       <nav className="px-6 py-5">
         <Link href="/" className="flex items-center gap-3 w-fit">
           <div
@@ -161,7 +161,7 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+        <main className="min-h-screen flex flex-col safe-top" style={{ background: 'var(--bg)' }}>
           <nav className="px-6 py-5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl loading-shimmer" />

@@ -94,7 +94,7 @@ export default function AdminPage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm font-medium mb-6 transition-colors hover:text-white"
+            className="inline-flex items-center gap-2 text-sm font-medium mb-4 sm:mb-6 transition-colors hover:text-white"
             style={{ color: 'var(--text-muted)' }}
           >
             <svg
@@ -110,16 +110,16 @@ export default function AdminPage() {
                 d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
               />
             </svg>
-            Back to Home
+            Back
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
               style={{ background: 'var(--surface-2)' }}
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
                 style={{ color: 'var(--brand)' }}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -138,10 +138,10 @@ export default function AdminPage() {
                 />
               </svg>
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold">Admin Panel</h1>
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                Manage games and settlements
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-semibold truncate">Admin Panel</h1>
+              <p className="text-xs sm:text-sm" style={{ color: 'var(--text-muted)' }}>
+                Settle games
               </p>
             </div>
           </div>
