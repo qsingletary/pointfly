@@ -12,4 +12,5 @@ export const validationSchema = Joi.object({
   ODDS_API_KEY: Joi.string().required(),
   ODDS_API_SPORT: Joi.string().default('basketball_nba'),
   GOOGLE_CLIENT_ID: Joi.string().required(),
+  ALLOWED_ORIGINS: Joi.string().default('http://localhost:3000'),
 });
