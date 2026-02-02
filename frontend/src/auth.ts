@@ -80,10 +80,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       // Refresh user data from backend on session update or when we have a token
-      if (
-        (trigger === 'update' || !extendedToken.favoriteTeam) &&
-        extendedToken.accessToken
-      ) {
+      if ((trigger === 'update' || !extendedToken.favoriteTeam) && extendedToken.accessToken) {
         try {
           const response = await fetch(`${API_URL}/auth/me`, {
             headers: {

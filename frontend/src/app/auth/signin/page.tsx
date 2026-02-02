@@ -29,14 +29,21 @@ function SignInContent() {
             {error === 'OAuthAccountNotLinked' && 'Email already linked to another account.'}
             {error === 'Callback' && 'Error during callback.'}
             {error === 'Default' && 'An error occurred during sign in.'}
-            {!['OAuthSignin', 'OAuthCallback', 'OAuthAccountNotLinked', 'Callback', 'Default'].includes(
-              error
-            ) && 'An unexpected error occurred.'}
+            {![
+              'OAuthSignin',
+              'OAuthCallback',
+              'OAuthAccountNotLinked',
+              'Callback',
+              'Default',
+            ].includes(error) && 'An unexpected error occurred.'}
           </div>
         )}
 
         <div className="bg-card rounded-lg shadow-lg p-8 border border-border">
-          <Button onClick={handleGoogleSignIn} className="w-full flex items-center justify-center gap-3">
+          <Button
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-3"
+          >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
