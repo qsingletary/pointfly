@@ -16,6 +16,8 @@ export interface TokenResponse {
     name: string;
     image?: string;
     points: number;
+    favoriteSport?: string;
+    favoriteTeam?: string;
   };
 }
 
@@ -85,6 +87,8 @@ export class AuthService {
         name: user.name,
         image: user.image,
         points: user.points,
+        favoriteSport: user.favoriteSport,
+        favoriteTeam: user.favoriteTeam,
       },
     };
   }
@@ -130,6 +134,8 @@ export class AuthService {
       name: user.name,
       image: user.image,
       points: user.points,
+      favoriteSport: user.favoriteSport,
+      favoriteTeam: user.favoriteTeam,
     };
   }
 }

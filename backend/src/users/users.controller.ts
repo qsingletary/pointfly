@@ -5,24 +5,60 @@ import {
   Body,
   UseGuards,
   NotFoundException,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { JwtAuthGuard, CurrentUser } from '../common';
+import {
+  JwtAuthGuard,
+  CurrentUser,
+  SPORTS_CONFIG,
+  getTeamsForSport,
+  getSupportedSports,
+} from '../common';
 import { UpdateFavoriteTeamDto } from './dto';
 import type { JwtPayload } from '../auth/strategies/jwt.strategy';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  /**
+   * Get the list of supported sports.
+   * Public endpoint - no authentication required.
+   */
+  @Get('sports')
+  getSports() {
+    const sports = Object.values(SPORTS_CONFIG).map((config) => ({
+      key: config.key,
+      name: config.name,
+    }));
+    return { sports };
+  }
+
+  /**
+   * Get the list of teams for a specific sport.
+   * Public endpoint - no authentication required.
+   */
+  @Get('sports/:sport/teams')
+  getTeamsForSport(@Param('sport') sport: string) {
+    const supportedSports = getSupportedSports();
+    if (!supportedSports.includes(sport)) {
+      throw new NotFoundException(
+        `Sport '${sport}' not found. Supported sports: ${supportedSports.join(', ')}`,
+      );
+    }
+    return { sport, teams: getTeamsForSport(sport) };
+  }
+
   @Patch('favorite-team')
+  @UseGuards(JwtAuthGuard)
   async updateFavoriteTeam(
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdateFavoriteTeamDto,
   ) {
     const updatedUser = await this.usersService.updateFavoriteTeam(
       user.sub,
+      dto.sport,
       dto.favoriteTeam,
     );
 
@@ -30,12 +66,16 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
 
-    return { favoriteTeam: updatedUser.favoriteTeam };
+    return {
+      favoriteSport: updatedUser.favoriteSport,
+      favoriteTeam: updatedUser.favoriteTeam,
+    };
   }
 
   @Get('favorite-team')
+  @UseGuards(JwtAuthGuard)
   async getFavoriteTeam(@CurrentUser() user: JwtPayload) {
-    const favoriteTeam = await this.usersService.getFavoriteTeam(user.sub);
-    return { favoriteTeam };
+    const { sport, team } = await this.usersService.getFavoriteTeam(user.sub);
+    return { favoriteSport: sport, favoriteTeam: team };
   }
 }

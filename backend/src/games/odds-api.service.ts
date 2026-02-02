@@ -41,7 +41,6 @@ export interface NextGameResponse {
 export class OddsApiService {
   private readonly logger = new Logger(OddsApiService.name);
   private readonly client: AxiosInstance;
-  private readonly sport: string;
 
   constructor(
     @InjectModel(Game.name) private gameModel: Model<GameDocument>,
@@ -54,24 +53,24 @@ export class OddsApiService {
       baseURL: baseUrl,
       params: { apiKey },
     });
-
-    this.sport = this.configService.get<string>(
-      'oddsApi.sport',
-      'basketball_nba',
-    );
   }
 
   /**
    * Fetch games from The Odds API and upsert favorite team games.
    * Returns the next upcoming game for the favorite team.
+   * @param sport - The Odds API sport key (e.g., 'basketball_nba')
+   * @param favoriteTeam - The user's favorite team name
    */
-  async fetchAndUpsertGames(favoriteTeam: string): Promise<NextGameResponse> {
+  async fetchAndUpsertGames(
+    sport: string,
+    favoriteTeam: string,
+  ): Promise<NextGameResponse> {
     this.logger.log(
-      `Fetching odds for ${this.sport}, favorite team: ${favoriteTeam}`,
+      `Fetching odds for ${sport}, favorite team: ${favoriteTeam}`,
     );
 
     const response = await this.client.get<OddsApiGame[]>(
-      `/sports/${this.sport}/odds`,
+      `/sports/${sport}/odds`,
       {
         params: {
           regions: 'us',

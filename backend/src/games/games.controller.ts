@@ -30,15 +30,15 @@ export class GamesController {
   @Get('next')
   @UseGuards(JwtAuthGuard)
   async getNextGame(@CurrentUser() user: JwtPayload) {
-    const favoriteTeam = await this.usersService.getFavoriteTeam(user.sub);
+    const { sport, team } = await this.usersService.getFavoriteTeam(user.sub);
 
-    if (!favoriteTeam) {
+    if (!sport || !team) {
       throw new BadRequestException(
         'You must set a favorite team before viewing games',
       );
     }
 
-    const game = await this.oddsApiService.getNextUpcomingGame(favoriteTeam);
+    const game = await this.oddsApiService.getNextUpcomingGame(team);
 
     if (!game) {
       throw new NotFoundException('No upcoming games found');
@@ -54,15 +54,15 @@ export class GamesController {
   @Post('next')
   @UseGuards(JwtAuthGuard)
   async fetchNextGame(@CurrentUser() user: JwtPayload) {
-    const favoriteTeam = await this.usersService.getFavoriteTeam(user.sub);
+    const { sport, team } = await this.usersService.getFavoriteTeam(user.sub);
 
-    if (!favoriteTeam) {
+    if (!sport || !team) {
       throw new BadRequestException(
         'You must set a favorite team before fetching games',
       );
     }
 
-    const result = await this.oddsApiService.fetchAndUpsertGames(favoriteTeam);
+    const result = await this.oddsApiService.fetchAndUpsertGames(sport, team);
 
     if (!result.game) {
       throw new NotFoundException('No upcoming games found for favorite team');

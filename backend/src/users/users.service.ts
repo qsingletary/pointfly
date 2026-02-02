@@ -16,18 +16,28 @@ export class UsersService {
 
   async updateFavoriteTeam(
     userId: string,
+    sport: string,
     favoriteTeam: string,
   ): Promise<UserDocument | null> {
     if (!Types.ObjectId.isValid(userId)) {
       return null;
     }
     return this.userModel
-      .findByIdAndUpdate(userId, { favoriteTeam }, { new: true })
+      .findByIdAndUpdate(
+        userId,
+        { favoriteSport: sport, favoriteTeam },
+        { new: true },
+      )
       .exec();
   }
 
-  async getFavoriteTeam(userId: string): Promise<string | null> {
+  async getFavoriteTeam(
+    userId: string,
+  ): Promise<{ sport: string | null; team: string | null }> {
     const user = await this.getUserById(userId);
-    return user?.favoriteTeam ?? null;
+    return {
+      sport: user?.favoriteSport ?? null,
+      team: user?.favoriteTeam ?? null,
+    };
   }
 }
