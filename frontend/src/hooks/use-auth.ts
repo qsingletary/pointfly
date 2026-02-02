@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
-import { setAuthToken } from '@/lib/api-client';
+import { setAuthToken } from '@/lib';
 
 export function useAuth() {
   const { data: session, status } = useSession();

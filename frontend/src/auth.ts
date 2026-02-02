@@ -48,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: '/auth/signin',
   },
   callbacks: {
-    async jwt({ token, account, trigger }): Promise<ExtendedToken> {
+    async jwt({ token, account, trigger, session }): Promise<ExtendedToken> {
       const extendedToken = token as ExtendedToken;
 
       // On initial sign-in, exchange Google ID token for backend JWT
@@ -79,24 +79,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       }
 
-      // Refresh user data from backend on session update or when we have a token
-      if ((trigger === 'update' || !extendedToken.favoriteTeam) && extendedToken.accessToken) {
-        try {
-          const response = await fetch(`${API_URL}/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${extendedToken.accessToken}`,
-            },
-          });
-
-          if (response.ok) {
-            const json = await response.json();
-            const user = json.data;
-            extendedToken.points = user.points;
-            extendedToken.favoriteSport = user.favoriteSport;
-            extendedToken.favoriteTeam = user.favoriteTeam;
-          }
-        } catch (error) {
-          console.error('Error refreshing user data:', error);
+      // Update session with data passed from client
+      if (trigger === 'update' && session) {
+        // Session contains the data passed to update() from the client
+        if (session.favoriteSport !== undefined) {
+          extendedToken.favoriteSport = session.favoriteSport;
+        }
+        if (session.favoriteTeam !== undefined) {
+          extendedToken.favoriteTeam = session.favoriteTeam;
+        }
+        if (session.points !== undefined) {
+          extendedToken.points = session.points;
         }
       }
 

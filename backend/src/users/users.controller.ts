@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Patch,
+  Delete,
   Body,
   UseGuards,
   NotFoundException,
@@ -77,5 +78,20 @@ export class UsersController {
   async getFavoriteTeam(@CurrentUser() user: JwtPayload) {
     const { sport, team } = await this.usersService.getFavoriteTeam(user.sub);
     return { favoriteSport: sport, favoriteTeam: team };
+  }
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  async deleteAccount(@CurrentUser() user: JwtPayload) {
+    const result = await this.usersService.deleteAccount(user.sub);
+
+    if (!result.userDeleted) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      message: 'Account deleted successfully',
+      deletedBets: result.deletedBets,
+    };
   }
 }

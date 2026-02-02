@@ -6,6 +6,7 @@ export default auth((req) => {
   const isAuthPage = req.nextUrl.pathname.startsWith('/auth');
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
   const isPublicRoute = req.nextUrl.pathname === '/';
+  const isAdminRoute = req.nextUrl.pathname === '/admin';
 
   // Allow API auth routes to pass through
   if (isApiAuthRoute) {
@@ -14,11 +15,11 @@ export default auth((req) => {
 
   // Redirect logged-in users away from auth pages
   if (isLoggedIn && isAuthPage) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
-  // Allow public routes and auth pages for non-logged-in users
-  if (isPublicRoute || isAuthPage) {
+  // Allow public routes, admin, and auth pages for non-logged-in users
+  if (isPublicRoute || isAuthPage || isAdminRoute) {
     return NextResponse.next();
   }
 

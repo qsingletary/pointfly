@@ -22,13 +22,18 @@ interface OddsApiBookmaker {
   markets: OddsApiMarket[];
 }
 
-interface OddsApiGame {
+// Response from /events endpoint (no odds data)
+interface OddsApiEvent {
   id: string;
   sport_key: string;
   sport_title: string;
   commence_time: string;
   home_team: string;
   away_team: string;
+}
+
+// Response from /odds endpoint (includes bookmakers)
+interface OddsApiGame extends OddsApiEvent {
   bookmakers: OddsApiBookmaker[];
 }
 
@@ -66,10 +71,44 @@ export class OddsApiService {
     favoriteTeam: string,
   ): Promise<NextGameResponse> {
     this.logger.log(
-      `Fetching odds for ${sport}, favorite team: ${favoriteTeam}`,
+      `Fetching events for ${sport}, favorite team: ${favoriteTeam}`,
     );
 
-    const response = await this.client.get<OddsApiGame[]>(
+    // Step 1: Fetch ALL upcoming events (doesn't count against quota)
+    const eventsResponse = await this.client.get<OddsApiEvent[]>(
+      `/sports/${sport}/events`,
+    );
+
+    const allEvents = eventsResponse.data;
+    this.logger.log(`Received ${allEvents.length} total events from /events`);
+
+    // Log all unique team names for debugging
+    const allTeams = new Set<string>();
+    allEvents.forEach((event) => {
+      allTeams.add(event.home_team);
+      allTeams.add(event.away_team);
+    });
+    this.logger.log(`Teams from API: ${[...allTeams].sort().join(', ')}`);
+
+    // Filter for events involving the favorite team
+    const favoriteTeamEvents = allEvents.filter(
+      (event) =>
+        event.home_team === favoriteTeam || event.away_team === favoriteTeam,
+    );
+
+    this.logger.log(
+      `Found ${favoriteTeamEvents.length} events involving ${favoriteTeam}`,
+    );
+
+    if (favoriteTeamEvents.length === 0) {
+      this.logger.warn(
+        `No events found for "${favoriteTeam}". Check team name spelling.`,
+      );
+      return { game: null };
+    }
+
+    // Step 2: Fetch odds to get spread data (counts against quota)
+    const oddsResponse = await this.client.get<OddsApiGame[]>(
       `/sports/${sport}/odds`,
       {
         params: {
@@ -80,26 +119,21 @@ export class OddsApiService {
       },
     );
 
-    const remainingRequests = this.parseRemainingRequests(response.headers);
-    const games = response.data;
+    const remainingRequests = this.parseRemainingRequests(oddsResponse.headers);
+    const gamesWithOdds = oddsResponse.data;
 
     this.logger.log(
-      `Received ${games.length} games, remaining API requests: ${remainingRequests}`,
+      `Received ${gamesWithOdds.length} games with odds, remaining API requests: ${remainingRequests}`,
     );
 
-    // Filter for games involving the favorite team
-    const favoriteTeamGames = games.filter(
-      (game) =>
-        game.home_team === favoriteTeam || game.away_team === favoriteTeam,
-    );
+    // Create a map of game IDs to odds data
+    const oddsMap = new Map<string, OddsApiGame>();
+    gamesWithOdds.forEach((game) => oddsMap.set(game.id, game));
 
-    this.logger.log(
-      `Found ${favoriteTeamGames.length} games involving ${favoriteTeam}`,
-    );
-
-    // Upsert each game
-    for (const game of favoriteTeamGames) {
-      await this.upsertGame(game, favoriteTeam);
+    // Step 3: Upsert each favorite team event, using odds if available
+    for (const event of favoriteTeamEvents) {
+      const gameWithOdds = oddsMap.get(event.id);
+      await this.upsertGameFromEvent(event, gameWithOdds, favoriteTeam);
     }
 
     // Return the next upcoming game
@@ -128,19 +162,28 @@ export class OddsApiService {
   }
 
   /**
-   * Upsert a game from The Odds API into MongoDB.
+   * Upsert a game from an event, optionally using odds data if available.
    */
-  private async upsertGame(
-    apiGame: OddsApiGame,
+  private async upsertGameFromEvent(
+    event: OddsApiEvent,
+    gameWithOdds: OddsApiGame | undefined,
     favoriteTeam: string,
   ): Promise<GameDocument> {
-    const spread = this.parseSpread(apiGame, favoriteTeam);
+    let spread = { team: favoriteTeam, point: 0 };
+
+    if (gameWithOdds) {
+      spread = this.parseSpread(gameWithOdds, favoriteTeam);
+    } else {
+      this.logger.debug(
+        `No odds available yet for game ${event.id}, using spread 0`,
+      );
+    }
 
     const gameData = {
-      gameId: apiGame.id,
-      homeTeam: apiGame.home_team,
-      awayTeam: apiGame.away_team,
-      startTime: new Date(apiGame.commence_time),
+      gameId: event.id,
+      homeTeam: event.home_team,
+      awayTeam: event.away_team,
+      startTime: new Date(event.commence_time),
       spread: spread.point,
       spreadTeam: spread.team,
       status: 'upcoming' as const,
@@ -151,7 +194,7 @@ export class OddsApiService {
     );
 
     return this.gameModel.findOneAndUpdate(
-      { gameId: apiGame.id },
+      { gameId: event.id },
       {
         $set: gameData,
       },
