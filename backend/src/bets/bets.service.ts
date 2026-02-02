@@ -118,4 +118,17 @@ export class BetsService {
     }
     return this.betModel.findById(betId).populate('gameId').exec();
   }
+
+  /**
+   * Get all bets with user and game details populated.
+   * Admin-only method.
+   */
+  async getAllBets(): Promise<BetDocument[]> {
+    return this.betModel
+      .find()
+      .populate('gameId')
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .exec();
+  }
 }

@@ -24,6 +24,14 @@ export class GamesService {
   ) {}
 
   /**
+   * Get all games, sorted by start time (newest first).
+   * Admin-only method.
+   */
+  async getAllGames(): Promise<GameDocument[]> {
+    return this.gameModel.find().sort({ startTime: -1 }).exec();
+  }
+
+  /**
    * Get a game by its MongoDB ObjectId.
    */
   async getGameById(gameId: string): Promise<GameDocument | null> {

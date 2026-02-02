@@ -28,7 +28,6 @@ export default function HomePage() {
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [remainingRequests, setRemainingRequests] = useState<number | null>(null);
   const [hasCheckedDb, setHasCheckedDb] = useState(false);
   const [totalBets, setTotalBets] = useState(0);
 
@@ -68,9 +67,6 @@ export default function HomePage() {
           try {
             const result = await fetchGamesFromApi();
             gameToShow = result.game;
-            if (result.remaining !== undefined) {
-              setRemainingRequests(result.remaining);
-            }
           } catch (fetchErr) {
             console.error('Auto-fetch error:', fetchErr);
           }
@@ -103,9 +99,6 @@ export default function HomePage() {
     try {
       const [result, userBets] = await Promise.all([fetchGamesFromApi(), getBets()]);
       setGame(result.game);
-      if (result.remaining !== undefined) {
-        setRemainingRequests(result.remaining);
-      }
       if (result.game) {
         const betOnGame = userBets.find((bet) => {
           const betGameId = typeof bet.gameId === 'string' ? bet.gameId : bet.gameId._id;
@@ -240,7 +233,7 @@ export default function HomePage() {
 
           {error && (
             <div
-              className="mb-6 p-4 rounded-xl flex justify-between items-center"
+              className="mb-6 p-4 rounded-xl flex justify-between items-center alert-enter"
               style={{
                 background: 'rgba(241, 94, 94, 0.1)',
                 border: '1px solid rgba(241, 94, 94, 0.2)',
@@ -251,7 +244,7 @@ export default function HomePage() {
               </span>
               <button
                 onClick={() => setError('')}
-                className="p-1 rounded-lg transition-colors hover:bg-white/5"
+                className="p-1.5 rounded-lg transition-colors hover:bg-white/10 active:scale-95"
                 style={{ color: 'var(--text-muted)' }}
               >
                 <svg
@@ -268,7 +261,7 @@ export default function HomePage() {
           )}
           {success && (
             <div
-              className="mb-6 p-4 rounded-xl flex justify-between items-center"
+              className="mb-6 p-4 rounded-xl flex justify-between items-center alert-enter success-pulse"
               style={{
                 background: 'rgba(30, 215, 96, 0.1)',
                 border: '1px solid rgba(30, 215, 96, 0.2)',
@@ -279,7 +272,7 @@ export default function HomePage() {
               </span>
               <button
                 onClick={() => setSuccess('')}
-                className="p-1 rounded-lg transition-colors hover:bg-white/5"
+                className="p-1.5 rounded-lg transition-colors hover:bg-white/10 active:scale-95"
                 style={{ color: 'var(--text-muted)' }}
               >
                 <svg
@@ -297,14 +290,7 @@ export default function HomePage() {
 
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-base font-semibold">Next Game</h2>
-                {remainingRequests !== null && (
-                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    {remainingRequests} API requests left
-                  </p>
-                )}
-              </div>
+              <h2 className="text-base font-semibold">Next Game</h2>
               <button
                 onClick={handleFetchGames}
                 disabled={fetching}
@@ -338,10 +324,6 @@ export default function HomePage() {
                 favoriteTeam={favoriteTeam}
                 existingBet={existingBet}
                 onPlaceBet={handleBet}
-                onCopyGameId={() => {
-                  navigator.clipboard.writeText(game._id);
-                  setSuccess('Game ID copied!');
-                }}
               />
             ) : (
               <div
@@ -402,8 +384,8 @@ export default function HomePage() {
 
             {bets.length > 0 ? (
               <div className="space-y-2">
-                {bets.map((bet) => (
-                  <BetItem key={bet._id} bet={bet} />
+                {bets.map((bet, index) => (
+                  <BetItem key={bet._id} bet={bet} index={index} />
                 ))}
               </div>
             ) : (

@@ -24,6 +24,16 @@ export class GamesController {
   ) {}
 
   /**
+   * Get all games (admin only).
+   * Returns all games sorted by start time.
+   */
+  @Get()
+  @UseGuards(AdminApiKeyGuard)
+  async getAllGames() {
+    return this.gamesService.getAllGames();
+  }
+
+  /**
    * Get the next upcoming game from the database.
    * Does not call the external Odds API.
    */
