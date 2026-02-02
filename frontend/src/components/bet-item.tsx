@@ -3,15 +3,20 @@ import type { Bet, Game } from '@/lib/api';
 
 interface BetItemProps {
   bet: Bet;
+  index?: number;
 }
 
-export function BetItem({ bet }: BetItemProps) {
+export function BetItem({ bet, index = 0 }: BetItemProps) {
   const game = typeof bet.gameId === 'object' ? (bet.gameId as Game) : null;
 
   return (
     <div
-      className="p-4 rounded-xl transition-all"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+      className="p-4 rounded-xl transition-all list-item-enter card-interactive"
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        animationDelay: `${Math.min(index * 50, 250)}ms`,
+      }}
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
@@ -22,12 +27,12 @@ export function BetItem({ bet }: BetItemProps) {
           ) : (
             <p className="font-semibold text-sm truncate">{bet.favoriteTeamAtBet}</p>
           )}
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1.5">
             <span
               className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
               style={{
                 background:
-                  bet.selection === 'favorite' ? 'rgba(191, 255, 0, 0.1)' : 'var(--surface-2)',
+                  bet.selection === 'favorite' ? 'rgba(191, 255, 0, 0.12)' : 'var(--surface-2)',
                 color: bet.selection === 'favorite' ? 'var(--brand)' : 'var(--text-muted)',
               }}
             >

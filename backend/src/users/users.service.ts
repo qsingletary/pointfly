@@ -18,6 +18,14 @@ export class UsersService {
     @InjectModel(Bet.name) private betModel: Model<BetDocument>,
   ) {}
 
+  /**
+   * Get all users sorted by points (highest first).
+   * Admin-only method.
+   */
+  async getAllUsers(): Promise<UserDocument[]> {
+    return this.userModel.find().sort({ points: -1 }).exec();
+  }
+
   async getUserById(userId: string): Promise<UserDocument | null> {
     if (!Types.ObjectId.isValid(userId)) {
       return null;

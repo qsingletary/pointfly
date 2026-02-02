@@ -141,32 +141,18 @@ export default function BetsPage() {
             </div>
           )}
 
-          <div
-            className="flex gap-2 p-1 rounded-xl mb-6"
-            style={{ background: 'var(--surface)' }}
-            role="tablist"
-            aria-label="Filter bets"
-          >
+          <div className="tab-bar mb-6" role="tablist" aria-label="Filter bets">
             {(['all', 'pending', 'won', 'lost'] as Filter[]).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 role="tab"
                 aria-selected={filter === f}
-                className="flex-1 py-2.5 rounded-lg text-sm font-medium capitalize transition-all cursor-pointer"
-                style={{
-                  background: filter === f ? 'var(--brand)' : 'transparent',
-                  color: filter === f ? '#000' : 'var(--text-muted)',
-                }}
+                className={`tab-item capitalize ${filter === f ? 'active' : ''}`}
               >
                 {f}
                 {f !== 'all' && (
-                  <span
-                    className="ml-1.5 text-xs"
-                    style={{
-                      opacity: filter === f ? 1 : 0.6,
-                    }}
-                  >
+                  <span className="ml-1.5 text-xs opacity-70">
                     ({f === 'won' ? stats.won : f === 'lost' ? stats.lost : stats.pending})
                   </span>
                 )}
@@ -207,8 +193,8 @@ export default function BetsPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {filtered.map((bet) => (
-                <BetItem key={bet._id} bet={bet} />
+              {filtered.map((bet, index) => (
+                <BetItem key={bet._id} bet={bet} index={index} />
               ))}
             </div>
           )}

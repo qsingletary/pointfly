@@ -145,6 +145,38 @@ export async function settleGame(
   return res.data;
 }
 
+export async function getAllGames(apiKey: string): Promise<Game[]> {
+  const res = await api.get('/games', {
+    headers: { 'X-Admin-API-Key': apiKey },
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+export async function getAllBets(apiKey: string): Promise<(Bet & { userId?: { name?: string; email?: string } })[]> {
+  const res = await api.get('/bets/all', {
+    headers: { 'X-Admin-API-Key': apiKey },
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+export interface AdminUser {
+  _id: string;
+  email: string;
+  name: string;
+  image?: string;
+  points: number;
+  favoriteSport?: string;
+  favoriteTeam?: string;
+  createdAt: string;
+}
+
+export async function getAllUsers(apiKey: string): Promise<AdminUser[]> {
+  const res = await api.get('/users/all', {
+    headers: { 'X-Admin-API-Key': apiKey },
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
 // ============ Account ============
 
 export async function deleteAccount(): Promise<{ message: string; deletedBets: number }> {
