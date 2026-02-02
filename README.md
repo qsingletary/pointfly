@@ -73,16 +73,16 @@ pointfly/
 
 ## API Endpoints
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/auth/token` | POST | - | Exchange Google ID token for JWT |
-| `/auth/me` | GET | JWT | Get current user |
-| `/games/next` | GET | JWT | Get next game for user's team |
-| `/games/next` | POST | JWT | Fetch latest from Odds API |
-| `/games/:id/settle` | POST | Admin | Settle game with scores |
-| `/bets` | POST | JWT | Place a bet |
-| `/bets` | GET | JWT | Get user's bet history |
-| `/users/favorite-team` | PATCH | JWT | Set favorite team |
+| Endpoint               | Method | Auth  | Description                      |
+| ---------------------- | ------ | ----- | -------------------------------- |
+| `/auth/token`          | POST   | -     | Exchange Google ID token for JWT |
+| `/auth/me`             | GET    | JWT   | Get current user                 |
+| `/games/next`          | GET    | JWT   | Get next game for user's team    |
+| `/games/next`          | POST   | JWT   | Fetch latest from Odds API       |
+| `/games/:id/settle`    | POST   | Admin | Settle game with scores          |
+| `/bets`                | POST   | JWT   | Place a bet                      |
+| `/bets`                | GET    | JWT   | Get user's bet history           |
+| `/users/favorite-team` | PATCH  | JWT   | Set favorite team                |
 
 ## How It Works
 
