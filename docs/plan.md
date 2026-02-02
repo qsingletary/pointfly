@@ -218,7 +218,7 @@ adjustedMargin = actualMargin + spreadAtBet;
 
 1. Create Next.js app with App Router in `frontend/`
 2. Configure Tailwind with team colors via CSS variables (configurable via env vars)
-3. Create base UI components (button, card, badge, skeleton)
+3. Create base UI components
 4. Set up API client with axios
 
 **Commit**: `feat(frontend): initialize nextjs with tailwind and app router`
