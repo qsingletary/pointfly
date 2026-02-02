@@ -152,7 +152,9 @@ export async function getAllGames(apiKey: string): Promise<Game[]> {
   return Array.isArray(res.data) ? res.data : [];
 }
 
-export async function getAllBets(apiKey: string): Promise<(Bet & { userId?: { name?: string; email?: string } })[]> {
+export async function getAllBets(
+  apiKey: string
+): Promise<(Bet & { userId?: { name?: string; email?: string } })[]> {
   const res = await api.get('/bets/all', {
     headers: { 'X-Admin-API-Key': apiKey },
   });

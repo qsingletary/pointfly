@@ -84,9 +84,9 @@ export default function AdminPage() {
     navigator.clipboard.writeText(text);
   }
 
-  const upcomingGames = games.filter(g => g.status === 'upcoming');
-  const finishedGames = games.filter(g => g.status === 'finished');
-  const pendingBets = bets.filter(b => b.status === 'pending');
+  const upcomingGames = games.filter((g) => g.status === 'upcoming');
+  const finishedGames = games.filter((g) => g.status === 'finished');
+  const pendingBets = bets.filter((b) => b.status === 'pending');
 
   return (
     <div className="min-h-screen p-6" style={{ background: 'var(--bg)' }}>
@@ -172,7 +172,9 @@ export default function AdminPage() {
               </button>
             </div>
             {error && (
-              <p className="text-sm mt-3" style={{ color: 'var(--error)' }}>{error}</p>
+              <p className="text-sm mt-3" style={{ color: 'var(--error)' }}>
+                {error}
+              </p>
             )}
           </div>
         )}
@@ -256,7 +258,10 @@ export default function AdminPage() {
                       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="flex items-center justify-center w-8 text-sm font-bold" style={{ color: 'var(--text-muted)' }}>
+                        <div
+                          className="flex items-center justify-center w-8 text-sm font-bold"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
                           #{index + 1}
                         </div>
                         <div
@@ -272,7 +277,10 @@ export default function AdminPage() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-sm font-semibold" style={{ color: 'var(--brand)' }}>
+                            <span
+                              className="text-sm font-semibold"
+                              style={{ color: 'var(--brand)' }}
+                            >
                               {user.name?.[0]?.toUpperCase() || '?'}
                             </span>
                           )}
@@ -287,22 +295,31 @@ export default function AdminPage() {
                           <p className="text-lg font-bold" style={{ color: 'var(--brand)' }}>
                             {user.points.toLocaleString()}
                           </p>
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>points</p>
+                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                            points
+                          </p>
                         </div>
                       </div>
-                      <div className="mt-3 pt-3 flex items-center gap-4 text-xs" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                      <div
+                        className="mt-3 pt-3 flex items-center gap-4 text-xs"
+                        style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}
+                      >
                         <span>
-                          Team: <strong className="text-white">{user.favoriteTeam || 'Not set'}</strong>
+                          Team:{' '}
+                          <strong className="text-white">{user.favoriteTeam || 'Not set'}</strong>
                         </span>
-                        <span>
-                          Joined: {new Date(user.createdAt).toLocaleDateString()}
-                        </span>
+                        <span>Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-8 text-center rounded-xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No users found</p>
+                  <div
+                    className="p-8 text-center rounded-xl"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                  >
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                      No users found
+                    </p>
                   </div>
                 )}
               </div>
@@ -313,7 +330,10 @@ export default function AdminPage() {
               <div className="space-y-3 mb-8">
                 {upcomingGames.length > 0 && (
                   <>
-                    <h3 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
+                    <h3
+                      className="text-sm font-medium uppercase tracking-wider mb-3"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Upcoming Games
                     </h3>
                     {upcomingGames.map((game) => (
@@ -324,22 +344,35 @@ export default function AdminPage() {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <p className="font-semibold">{game.awayTeam} @ {game.homeTeam}</p>
+                            <p className="font-semibold">
+                              {game.awayTeam} @ {game.homeTeam}
+                            </p>
                             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                               {new Date(game.startTime).toLocaleString()}
                             </p>
                           </div>
                           <span
                             className="px-2 py-1 rounded text-xs font-medium"
-                            style={{ background: 'rgba(255, 167, 38, 0.15)', color: 'var(--warning)' }}
+                            style={{
+                              background: 'rgba(255, 167, 38, 0.15)',
+                              color: 'var(--warning)',
+                            }}
                           >
                             Upcoming
                           </span>
                         </div>
-                        <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid var(--border)' }}>
+                        <div
+                          className="flex items-center justify-between pt-3"
+                          style={{ borderTop: '1px solid var(--border)' }}
+                        >
                           <div className="flex items-center gap-2">
-                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>ID:</span>
-                            <code className="text-xs font-mono px-2 py-1 rounded" style={{ background: 'var(--surface-2)' }}>
+                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                              ID:
+                            </span>
+                            <code
+                              className="text-xs font-mono px-2 py-1 rounded"
+                              style={{ background: 'var(--surface-2)' }}
+                            >
                               {game._id}
                             </code>
                           </div>
@@ -360,7 +393,10 @@ export default function AdminPage() {
 
                 {finishedGames.length > 0 && (
                   <>
-                    <h3 className="text-sm font-medium uppercase tracking-wider mb-3 mt-6" style={{ color: 'var(--text-muted)' }}>
+                    <h3
+                      className="text-sm font-medium uppercase tracking-wider mb-3 mt-6"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       Finished Games
                     </h3>
                     {finishedGames.slice(0, 5).map((game) => (
@@ -371,7 +407,9 @@ export default function AdminPage() {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-semibold">{game.awayTeam} @ {game.homeTeam}</p>
+                            <p className="font-semibold">
+                              {game.awayTeam} @ {game.homeTeam}
+                            </p>
                             <p className="text-sm mt-1">
                               {game.finalAwayScore} - {game.finalHomeScore}
                             </p>
@@ -389,8 +427,13 @@ export default function AdminPage() {
                 )}
 
                 {games.length === 0 && (
-                  <div className="p-8 text-center rounded-xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No games found</p>
+                  <div
+                    className="p-8 text-center rounded-xl"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                  >
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                      No games found
+                    </p>
                   </div>
                 )}
               </div>
@@ -401,7 +444,7 @@ export default function AdminPage() {
               <div className="space-y-3 mb-8">
                 {bets.length > 0 ? (
                   bets.map((bet) => {
-                    const game = typeof bet.gameId === 'object' ? bet.gameId as Game : null;
+                    const game = typeof bet.gameId === 'object' ? (bet.gameId as Game) : null;
                     return (
                       <div
                         key={bet._id}
@@ -419,34 +462,45 @@ export default function AdminPage() {
                               </p>
                             )}
                           </div>
-                          <span
-                            className={`badge badge-${bet.status}`}
-                          >
-                            {bet.status}
-                          </span>
+                          <span className={`badge badge-${bet.status}`}>{bet.status}</span>
                         </div>
-                        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <div
+                          className="flex items-center gap-4 text-xs"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
                           <span>
                             Picked:{' '}
                             <strong style={{ color: 'var(--brand)' }}>
                               {bet.selection === 'favorite'
                                 ? bet.favoriteTeamAtBet
                                 : game
-                                  ? (game.homeTeam === bet.favoriteTeamAtBet ? game.awayTeam : game.homeTeam)
+                                  ? game.homeTeam === bet.favoriteTeamAtBet
+                                    ? game.awayTeam
+                                    : game.homeTeam
                                   : 'Opponent'}
                             </strong>
                           </span>
                           <span>
-                            Spread: <strong className="text-white">{bet.spreadAtBet > 0 ? '+' : ''}{bet.spreadAtBet}</strong>
+                            Spread:{' '}
+                            <strong className="text-white">
+                              {bet.spreadAtBet > 0 ? '+' : ''}
+                              {bet.spreadAtBet}
+                            </strong>
                           </span>
-                          <span>
-                            {new Date(bet.createdAt).toLocaleDateString()}
-                          </span>
+                          <span>{new Date(bet.createdAt).toLocaleDateString()}</span>
                         </div>
                         {game && (
-                          <div className="mt-3 pt-3 flex items-center gap-2" style={{ borderTop: '1px solid var(--border)' }}>
-                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Game ID:</span>
-                            <code className="text-xs font-mono px-2 py-1 rounded" style={{ background: 'var(--surface-2)' }}>
+                          <div
+                            className="mt-3 pt-3 flex items-center gap-2"
+                            style={{ borderTop: '1px solid var(--border)' }}
+                          >
+                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                              Game ID:
+                            </span>
+                            <code
+                              className="text-xs font-mono px-2 py-1 rounded"
+                              style={{ background: 'var(--surface-2)' }}
+                            >
                               {game._id}
                             </code>
                           </div>
@@ -455,8 +509,13 @@ export default function AdminPage() {
                     );
                   })
                 ) : (
-                  <div className="p-8 text-center rounded-xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No bets found</p>
+                  <div
+                    className="p-8 text-center rounded-xl"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                  >
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                      No bets found
+                    </p>
                   </div>
                 )}
               </div>
@@ -576,7 +635,8 @@ export default function AdminPage() {
               <div
                 className="p-6 rounded-xl"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(30, 215, 96, 0.08) 0%, transparent 100%)',
+                  background:
+                    'linear-gradient(135deg, rgba(30, 215, 96, 0.08) 0%, transparent 100%)',
                   border: '1px solid rgba(30, 215, 96, 0.2)',
                 }}
               >
@@ -593,7 +653,11 @@ export default function AdminPage() {
                       strokeWidth={2}
                       stroke="currentColor"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-base font-semibold" style={{ color: 'var(--success)' }}>
@@ -649,7 +713,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <button onClick={() => setResult(null)} className="w-full mt-6 btn btn-secondary py-3">
+                <button
+                  onClick={() => setResult(null)}
+                  className="w-full mt-6 btn btn-secondary py-3"
+                >
                   Dismiss
                 </button>
               </div>

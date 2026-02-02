@@ -10,12 +10,7 @@ interface GameCardProps {
   onPlaceBet: (selection: 'favorite' | 'opponent') => Promise<void>;
 }
 
-export function GameCard({
-  game,
-  favoriteTeam,
-  existingBet,
-  onPlaceBet,
-}: GameCardProps) {
+export function GameCard({ game, favoriteTeam, existingBet, onPlaceBet }: GameCardProps) {
   const [confirmBet, setConfirmBet] = useState<'favorite' | 'opponent' | null>(null);
   const [betting, setBetting] = useState(false);
 

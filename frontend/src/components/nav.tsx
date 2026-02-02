@@ -227,9 +227,7 @@ export function Nav() {
                 href={item.href}
                 className={`nav-item-mobile ${isActive ? 'active' : ''}`}
               >
-                <span className="nav-icon">
-                  {isActive ? item.iconFilled : item.icon}
-                </span>
+                <span className="nav-icon">{isActive ? item.iconFilled : item.icon}</span>
                 <span>{item.label}</span>
               </Link>
             );

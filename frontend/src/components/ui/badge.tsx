@@ -13,9 +13,5 @@ const statusLabels: Record<Status, string> = {
 };
 
 export function Badge({ status, className = '' }: BadgeProps) {
-  return (
-    <span className={`badge badge-${status} ${className}`}>
-      {statusLabels[status]}
-    </span>
-  );
+  return <span className={`badge badge-${status} ${className}`}>{statusLabels[status]}</span>;
 }
