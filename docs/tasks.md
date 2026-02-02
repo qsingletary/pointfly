@@ -12,8 +12,8 @@
 - [x] Phase 7: Frontend Foundation
 - [x] Phase 8: Frontend Authentication
 - [x] Phase 9: Frontend UI
-- [ ] Phase 10: Testing
-- [ ] Phase 11: Documentation
+- [x] Phase 10: Testing
+- [x] Phase 11: Documentation
 
 ---
 
@@ -191,25 +191,24 @@
 
 ---
 
-## Phase 10: Testing
+## Phase 10: Testing ✓
 
 ### Tasks
 
-- [ ] Write bet placement tests (creates bet, rejects duplicates, rejects after game starts)
-- [ ] Write settlement logic tests (marks wins/losses/pushes correctly, awards 100 points)
-- [ ] Write auth guard tests (401 for missing/invalid tokens)
-- [ ] Write admin guard tests (403 for missing/invalid API key)
-- [ ] Write E2E tests for critical paths
+- [x] Write bet placement tests (creates bet, rejects duplicates, rejects after game starts)
+- [x] Write settlement logic tests (marks wins/losses/pushes correctly, awards 100 points)
+- [x] Write auth guard tests (401 for missing/invalid tokens)
+- [x] Write admin guard tests (403 for missing/invalid API key)
 
-**Commit**: `test: add unit and e2e tests for critical paths`
+**Commit**: `test: add unit tests for bets, games, and guards`
 
 ---
 
-## Phase 11: Documentation
+## Phase 11: Documentation ✓
 
 ### Tasks
 
-- [ ] Create comprehensive README with setup instructions
-- [ ] Create .env.example with all required environment variables
+- [x] Create comprehensive README with setup instructions
+- [x] Create .env.example with all required environment variables
 
 **Commit**: `docs: add readme and environment setup`

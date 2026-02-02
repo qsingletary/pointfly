@@ -250,6 +250,13 @@ label {
   padding-top: env(safe-area-inset-top, 0);
 }
 
+/* PWA standalone mode - add extra top padding for status bar */
+@media (display-mode: standalone) {
+  .pwa-safe-top {
+    padding-top: max(env(safe-area-inset-top, 0), 20px);
+  }
+}
+
 /* ===== LOADING STATES ===== */
 .loading-pulse {
   animation: pulse 1.5s ease-in-out infinite;
