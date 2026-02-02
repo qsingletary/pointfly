@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { configuration, validationSchema } from './config';
+import { CustomThrottlerGuard } from './common';
 import { AuthModule } from './auth';
 import { UsersModule } from './users';
 import { GamesModule } from './games';
@@ -40,10 +41,10 @@ import { BetsModule } from './bets';
   controllers: [AppController],
   providers: [
     AppService,
-    // Apply rate limiting globally
+    // Apply rate limiting globally (skips OPTIONS preflight requests)
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: CustomThrottlerGuard,
     },
   ],
 })
