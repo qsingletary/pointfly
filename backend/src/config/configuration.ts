@@ -16,4 +16,5 @@ export default () => ({
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID,
   },
+  allowedOrigins: process.env.ALLOWED_ORIGINS,
 });
