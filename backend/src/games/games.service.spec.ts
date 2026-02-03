@@ -19,6 +19,7 @@ describe('GamesService', () => {
     awayTeam: 'Boston Celtics',
     startTime: new Date(Date.now() - 86400000), // yesterday (already started)
     spread: -4.5,
+    spreadTeam: 'Los Angeles Lakers', // Lakers are the spread favorite
     status: 'upcoming',
     finalHomeScore: undefined,
     finalAwayScore: undefined,
