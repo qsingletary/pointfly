@@ -121,13 +121,12 @@ export class GamesService {
    * Determine the result of a bet based on the game outcome.
    *
    * Settlement logic:
-   * - favoriteScore = score of the user's favorite team at bet time
-   * - opponentScore = score of the other team
-   * - actualMargin = favoriteScore - opponentScore
-   * - adjustedMargin = actualMargin + spread (spread is typically negative for favorites)
+   * - The spread (e.g., -5.5) applies to the SPREAD TEAM (game.spreadTeam), not the user's team
+   * - If user's favorite team IS the spread team, they must win by more than |spread|
+   * - If user's favorite team is NOT the spread team, they're the underdog and can lose by up to |spread|
    *
-   * For 'favorite' bets: adjustedMargin > 0 = WIN, < 0 = LOSE, = 0 = PUSH
-   * For 'opponent' bets: adjustedMargin < 0 = WIN, > 0 = LOSE, = 0 = PUSH
+   * For 'favorite' bets: user wins if their favorite team covers the spread
+   * For 'opponent' bets: user wins if their favorite team's opponent covers the spread
    */
   private determineBetResult(
     game: GameDocument,
@@ -137,28 +136,35 @@ export class GamesService {
     finalAwayScore: number,
     favoriteTeamAtBet: string,
   ): 'won' | 'lost' | 'push' {
-    // Determine which score belongs to the favorite team (at bet time)
-    const favoriteScore =
+    // Get scores for the user's favorite team and their opponent
+    const userFavoriteScore =
       game.homeTeam === favoriteTeamAtBet ? finalHomeScore : finalAwayScore;
     const opponentScore =
       game.homeTeam === favoriteTeamAtBet ? finalAwayScore : finalHomeScore;
 
-    // Calculate the margin with spread adjustment
-    const actualMargin = favoriteScore - opponentScore;
-    const adjustedMargin = actualMargin + spreadAtBet;
+    // The spread is defined from the spread team's perspective (negative means they're favored)
+    // Adjust the spread based on whether the user's favorite team is the spread team or not
+    // - If user's favorite IS the spread team: use spread as-is (negative, they need to win by that margin)
+    // - If user's favorite is NOT the spread team: flip the spread (positive, they're the underdog)
+    const adjustedSpread =
+      favoriteTeamAtBet === game.spreadTeam ? spreadAtBet : -spreadAtBet;
+
+    const actualMargin = userFavoriteScore - opponentScore;
+    const adjustedMargin = actualMargin + adjustedSpread;
 
     this.logger.debug(
-      `Bet result calculation: favorite=${favoriteScore}, opponent=${opponentScore}, ` +
-        `margin=${actualMargin}, spread=${spreadAtBet}, adjusted=${adjustedMargin}, selection=${selection}`,
+      `Bet result calculation: userFavorite=${favoriteTeamAtBet}(${userFavoriteScore}), ` +
+        `opponent=${opponentScore}, spreadTeam=${game.spreadTeam}, rawSpread=${spreadAtBet}, ` +
+        `adjustedSpread=${adjustedSpread}, margin=${actualMargin}, adjustedMargin=${adjustedMargin}, selection=${selection}`,
     );
 
     if (selection === 'favorite') {
-      // Favorite bet wins if adjusted margin is positive
+      // User bet on their favorite team - they win if adjustedMargin is positive
       if (adjustedMargin > 0) return 'won';
       if (adjustedMargin < 0) return 'lost';
       return 'push';
     } else {
-      // Opponent bet wins if adjusted margin is negative
+      // User bet against their favorite team - they win if adjustedMargin is negative
       if (adjustedMargin < 0) return 'won';
       if (adjustedMargin > 0) return 'lost';
       return 'push';
